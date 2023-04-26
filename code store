@@ -1,0 +1,80 @@
+ ---------------------------------code copied from registration.php------------------------------------------
+ <?php
+    require('db.php');
+
+
+    // When form submitted, insert values into the database.
+    if (isset($_REQUEST['username'])) {
+        // removes backslashes
+        $username = stripslashes($_REQUEST['username']);
+        //escapes special characters in a string
+        $username = mysqli_real_escape_string($con, $username);
+        $email    = stripslashes($_REQUEST['email']);
+        $email    = mysqli_real_escape_string($con, $email);
+        $password = stripslashes($_REQUEST['password']);
+        $password = mysqli_real_escape_string($con, $password);
+        $create_datetime = date("Y-m-d H:i:s");
+
+        if ($_SERVER['REQUEST_METHOD']=='POST'){
+        $fullname=$_POST["fullname"];
+        $username=$_POST["username"];
+        $email=$_POST["email"];
+        $password=$_POST["password"];
+        $confirm_password=$_POST["confirm_password"];
+  
+        if(empty($fullname) || empty($username)|| empty($email) || empty($password) || empty($confirm_password)){
+        $errorMessage="All the fields are required";
+        exit;
+        }
+    
+       
+        if($password !==$confirm_password){
+        $errorMessage="Password Not match";
+
+        }elseif(!$username){
+        $check_username= "SELECT * FROM user WHERE username='$username'";
+        $query=mysqli_query($con,$check_username);
+                if (mysqli_num_rows($query)>0){
+                   $errorMessage= "Username already Exist";
+                   }
+
+        }
+        else{
+         //check email
+        $check_email= "SELECT * FROM user WHERE email='$email'";
+        $query=mysqli_query($con,$check_email);
+                if (mysqli_num_rows($query)>0){
+                   $errorMessage= "Email already Exist";
+                   }
+                else{
+                     $sql = "INSERT INTO user(fullname,username, password, email, create_datetime)
+                     VALUES ('$fullname','$username', '" . md5($password) . "', '$email', '$create_datetime')";
+                     $result   = mysqli_query($con, $sql);
+
+                  }
+    }
+}
+
+        if ($result) {
+            $errorMessage = "Invalid query:".$con->error;
+      exit;
+        } 
+        else {
+            header("location:/quiz/login.php");
+    
+            
+    $fullname="";
+    $username="";
+    $email="";
+    $password="";
+    $confirm_password="";
+    $create_datetime="";
+
+    $successMessage= "CLient added successfuly";
+    }
+}
+
+
+    
+?> 
+-----------------------------------from registration.php---- end here-----------------------------
